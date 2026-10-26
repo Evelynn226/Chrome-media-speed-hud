@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Media Speed HUD",
+  "version": "1.2.0",
+  "description": "快捷键调节网页视频/音频播放速度：1 复原、2 两倍速、5 一点五倍速、- / = 微调 0.1。左上角短暂显示速度提示，并按视频记忆上次速度。",
+  "minimum_chrome_version": "102",
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Media Speed HUD",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

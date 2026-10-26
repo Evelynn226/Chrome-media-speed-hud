@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Media Speed HUD</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <header class="head">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>Media Speed HUD</h1>
+        <p class="sub" id="pageInfo">检测中…</p>
+      </div>
+    </div>
+    <button class="icon-btn" id="btnOptions" title="打开设置">⚙</button>
+  </header>
+
+  <!-- 模块 1：当前速度 -->
+  <section class="card">
+    <div class="rate-line">
+      <span class="rate" id="rateValue">1×</span>
+      <div class="quick">
+        <button class="chip" data-rate="1" title="快捷键 1">1×</button>
+        <button class="chip" data-rate="1.5" title="快捷键 5">1.5×</button>
+        <button class="chip" data-rate="2" title="快捷键 2">2×</button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn step" id="btnMinus" title="减一档">−</button>
+      <input class="slider" id="slider" type="range" min="0.1" max="4" step="0.05" value="1">
+      <button class="btn step" id="btnPlus" title="加一档">+</button>
+    </div>
+    <div class="presets" id="presets"></div>
+  </section>
+
+  <!-- 模块 2：本页快捷键开关 -->
+  <section class="card">
+    <div class="switch">
+      <div class="sw-text">
+        <b>在本页禁用快捷键</b>
+        <small id="siteNote">站点快捷键冲突时打开</small>
+      </div>
+      <input type="checkbox" id="swSiteOff" class="toggle">
+    </div>
+  </section>
+
+  <p class="tip" id="statusLine"></p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

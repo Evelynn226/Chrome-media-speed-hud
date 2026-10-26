@@ -1,0 +1,165 @@
+/* ==========================================================================
+   Media Speed HUD — 视频左上角速度提示样式
+   注意：content.css 由 manifest 注入到页面，所有选择器都带 vsh- 前缀，
+   并使用 !important 防止站点样式覆盖（站点自身的 .card/.rate 之类很常见）。
+
+   宽度策略：卡片用 width:max-content 紧贴文字内容，速度条用 align-self:stretch
+   跟随卡片宽度（不用 width:100%，避免撑开容器造成右侧空白）。
+   透明度：--vsh-a1 / --vsh-a2 由 content.js 按设置 hudAlpha 注入。
+   ========================================================================== */
+
+.vsh-hud {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  z-index: 2147483647 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform-origin: 0 0 !important;
+  will-change: transform !important;
+  line-height: normal !important;
+  text-indent: 0 !important;
+  letter-spacing: normal !important;
+  text-align: left !important;
+  direction: ltr !important;
+  white-space: nowrap !important;
+  filter: none !important;
+  transition: none !important;
+}
+
+/* 卡片本体负责出现/消失动画，外层 .vsh-hud 只负责定位（避免 transform 冲突） */
+.vsh-hud .vsh-card {
+  --vsh-accent: #8ab4ff;
+  --vsh-a1: 0.55;
+  --vsh-a2: 0.48;
+
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 220px !important;
+  padding: 6px 9px 7px !important;
+  margin: 0 !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(24, 24, 28, var(--vsh-a1)) 0%,
+    rgba(8, 8, 10, var(--vsh-a2)) 100%
+  ) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28) !important;
+  color: #fff !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.25) !important;
+  backdrop-filter: blur(8px) saturate(1.25) !important;
+
+  opacity: 0 !important;
+  transform: translateY(-9px) scale(0.88) !important;
+  transform-origin: 0 0 !important;
+  transition:
+    opacity 0.18s ease-out,
+    transform 0.28s cubic-bezier(0.16, 1.02, 0.3, 1) !important;
+}
+
+.vsh-hud.vsh-show .vsh-card {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* 连续按键时的轻微弹跳，让每次调节都有反馈 */
+.vsh-hud.vsh-bump .vsh-card {
+  animation: vsh-bump 0.24s cubic-bezier(0.2, 1.4, 0.4, 1) !important;
+}
+
+@keyframes vsh-bump {
+  0% { scale: 1.05; }
+  100% { scale: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vsh-hud .vsh-card { transition-duration: 0.01s !important; }
+  .vsh-hud.vsh-bump .vsh-card { animation: none !important; }
+}
+
+/* ---- 内部结构 ---- */
+
+.vsh-hud .vsh-row {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 4px !important;
+  line-height: 1.1 !important;
+}
+
+.vsh-hud .vsh-arrow {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  opacity: 0.92 !important;
+  color: var(--vsh-accent) !important;
+}
+
+.vsh-hud .vsh-rate {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.2px !important;
+  font-variant-numeric: tabular-nums !important;
+  color: #fff !important;
+}
+
+.vsh-hud .vsh-note {
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.2px !important;
+  color: rgba(255, 255, 255, 0.58) !important;
+  max-width: 120px !important;
+  white-space: nowrap !important;
+}
+
+.vsh-hud .vsh-note:empty {
+  display: none !important;
+}
+
+/* align-self:stretch 跟随卡片宽度，不用百分比宽度（百分比会把容器撑宽） */
+.vsh-hud .vsh-bar {
+  align-self: stretch !important;
+  min-width: 32px !important;
+  height: 3px !important;
+  margin: 0 !important;
+  border-radius: 3px !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  overflow: hidden !important;
+}
+
+.vsh-hud .vsh-bar i {
+  display: block !important;
+  height: 100% !important;
+  width: 0 !important;
+  border-radius: 3px !important;
+  background: var(--vsh-accent) !important;
+  box-shadow: 0 0 7px var(--vsh-accent) !important;
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.vsh-hud.vsh-hide-bar .vsh-bar { display: none !important; }
+
+/* ---- 状态配色 ---- */
+.vsh-hud[data-kind="up"] .vsh-card     { --vsh-accent: #3fd39b !important; }
+.vsh-hud[data-kind="down"] .vsh-card   { --vsh-accent: #ffb35c !important; }
+.vsh-hud[data-kind="flat"] .vsh-card   { --vsh-accent: #8ab4ff !important; }
+.vsh-hud[data-kind="reset"] .vsh-card  { --vsh-accent: #8ab4ff !important; }
+.vsh-hud[data-kind="restored"] .vsh-card { --vsh-accent: #c39bff !important; }
