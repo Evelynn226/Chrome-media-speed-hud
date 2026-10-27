@@ -112,4 +112,3 @@ kbd.rm:hover { border-color: var(--danger); color: var(--danger); }
 .site-tag button:hover { color: var(--danger); }
 .empty { color: var(--muted); font-size: 12.5px; }
 
-/* 记忆概况：只用一行文本描述，不再列明细表 */

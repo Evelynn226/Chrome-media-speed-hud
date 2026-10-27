@@ -545,7 +545,7 @@
 
   const hud = {
     root: null, card: null, rateEl: null, arrowEl: null, noteEl: null, barEl: null,
-    target: null, hideAt: 0, raf: 0
+    target: null, hideAt: 0, raf: 0, removeTimer: 0
   };
 
   const ARROWS = { up: '▲', down: '▼', reset: '＝', flat: '●', restored: '↺' };
@@ -569,7 +569,8 @@
     hud.arrowEl = root.querySelector('.vsh-arrow');
     hud.noteEl = root.querySelector('.vsh-note');
     hud.barEl = root.querySelector('.vsh-bar i');
-    mountHud();
+    // Keep the hidden node only while it may be reused for a quick repeat keypress.
+    mountHud(true);
     return root;
   }
 
@@ -586,14 +587,18 @@
     return document.body || document.documentElement;
   }
 
-  function mountHud() {
-    if (!hud.root) return;
+  function mountHud(force = false) {
+    // A detached, hidden HUD must stay detached; otherwise fullscreen changes
+    // could put its backdrop layer back over the video after the toast expires.
+    if (!hud.root || (!force && !hud.root.classList.contains('vsh-show'))) return;
     const host = hostElement();
     if (hud.root.parentElement !== host) host.appendChild(hud.root);
   }
 
   function showHud(el, rate, kind, note) {
     const root = ensureHud();
+    clearTimeout(hud.removeTimer);
+    hud.removeTimer = 0;
     hud.target = el;
 
     root.dataset.kind = kind || 'flat';
@@ -612,9 +617,11 @@
     const span = Math.max(settings.max - settings.min, 0.1);
     hud.barEl.style.width = clamp(((rate - settings.min) / span) * 100, 2, 100).toFixed(1) + '%';
 
-    root.classList.add('vsh-show');
-    root.classList.remove('vsh-bump');
+    root.classList.remove('vsh-show', 'vsh-bump');
     void root.offsetWidth; // 重启动画：连续按键每次都有反馈
+    root.classList.add('vsh-show');
+    root.setAttribute('aria-hidden', 'false');
+    mountHud();
     root.classList.add('vsh-bump');
 
     positionHud();
@@ -624,7 +631,20 @@
   }
 
   function hideHud() {
-    if (hud.root) hud.root.classList.remove('vsh-show');
+    if (hud.root) {
+      const root = hud.root;
+      root.classList.remove('vsh-show', 'vsh-bump');
+      root.setAttribute('aria-hidden', 'true');
+      clearTimeout(hud.removeTimer);
+      // Let the 280 ms fade finish, then remove the overlay node entirely so
+      // Chrome can restore the video's direct-composition path.
+      hud.removeTimer = setTimeout(() => {
+        if (hud.root === root && !hud.target && !root.classList.contains('vsh-show')) {
+          root.remove();
+        }
+        hud.removeTimer = 0;
+      }, 320);
+    }
     hud.target = null;
     stopTicker();
   }

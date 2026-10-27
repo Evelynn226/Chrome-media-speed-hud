@@ -78,7 +78,6 @@
           <option value="0">永久保留（仅按 1200 条上限淘汰）</option>
         </select>
       </div>
-      <p class="hint" id="memStats"></p>
       <p class="hint">记忆键：有真实视频地址时按 <code>域名 + 路径</code> 记忆（忽略签名参数）；YouTube / Bilibili 等 blob 播放器按 <code>视频 ID + 时长</code> 记忆。</p>
       <div class="row-actions">
         <button class="btn ghost danger" id="btnClearMemory">清空全部速度记忆</button>
@@ -97,12 +96,6 @@
         <input id="siteInput" type="text" placeholder="https://example.com" spellcheck="false">
         <button class="btn" id="btnAddSite">添加</button>
       </div>
-    </section>
-
-    <!-- 记忆概况 -->
-    <section class="card wide">
-      <h2>📚 记忆概况</h2>
-      <p class="hint" id="memStats">加载中…</p>
     </section>
   </main>
 

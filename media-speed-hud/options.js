@@ -32,8 +32,6 @@ const DEFAULTS = {
   keysUp: ['Equal', 'NumpadAdd']
 };
 
-const MEMORY_MAX = 1200;
-
 let settings = JSON.parse(JSON.stringify(DEFAULTS));
 let memory = {};
 let siteOff = {};
@@ -350,9 +348,8 @@ $('#sizeInput').addEventListener('change', (e) => {
 $('#ttlSel').addEventListener('change', (e) => {
   settings.ttlDays = Math.round(Number(e.target.value) || 0);
   queueSave();
-  // 改保留期后立刻执行一次淘汰，页面上一眼就能看到变化
+  // 改保留期后立刻淘汰一次旧记忆
   pruneNow();
-  renderMemory();
 });
 
 function clampNum(n, lo, hi, fallback) {
@@ -425,22 +422,10 @@ $('#btnAddSite').addEventListener('click', () => {
 // 记忆管理
 // ---------------------------------------------------------------------------
 
-function renderMemory() {
-  const keys = Object.keys(memory);
-  let bytes = 0;
-  for (const k of keys) bytes += k.length + 32;
-
-  const ttl = Number(settings.ttlDays) || 0;
-  $('#memStats').textContent =
-    `${keys.length} 条记忆，约 ${(bytes / 1024).toFixed(1)} KB（存储配额 10 MB）· 条目上限 ${MEMORY_MAX} 条 · ` +
-    (ttl > 0 ? `${ttl} 天未使用自动删除` : '未启用时间淘汰') +
-    '。后台标签页不做页面扇描，记忆量对这个量级不会造成卡顿。';
-}
-
 $('#btnClearMemory').addEventListener('click', () => {
   if (!confirm('确定清空全部播放速度记忆？该操作不可撤销。')) return;
   memory = {};
-  chrome.storage.local.set({ [K_MEMORY]: {} }, renderMemory);
+  chrome.storage.local.set({ [K_MEMORY]: {} });
   flashSaved();
 });
 
@@ -470,7 +455,6 @@ $('#fileImport').addEventListener('change', async (e) => {
       n++;
     }
     queueLocalSave();
-    renderMemory();
     alert(`已导入 ${n} 条记忆`);
   } catch (err) {
     alert('导入失败：文件不是本扩展导出的 JSON');
@@ -499,5 +483,4 @@ $('#fileImport').addEventListener('change', async (e) => {
   renderSettings();
   renderSites();
   pruneNow();
-  renderMemory();
 })();
